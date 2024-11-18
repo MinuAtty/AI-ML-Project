@@ -5,6 +5,7 @@
 As people increasingly use digital devices like smartphones and smartwatches to access sensitive information, such as online payments and banking, it's crucial to have an enhanced authentication method that continuously and transparently safeguards user data from unauthorized access. This assessment seeks to evaluate acceleration-based features and explore their potential for verifying user identity through neural networks.
 
 
+
 ### Step 1: Understanding the Problem and Dataset
 
 Objective:
@@ -14,6 +15,8 @@ Objective:
 Dataset Structure:
 - Each user has multiple feature sets derived from time and frequency domain acceleration data. 
 - Files contain data for inter- and intra-user sessions, representing variations in movement patterns.
+
+
 
 ### Step 2: Data Loading and Preprocessing
 
@@ -32,6 +35,8 @@ Split the Dataset:
 - Split the dataset into training (80%) and test (20%) sets.
 - Use stratified splitting to ensure an even distribution of user data across both sets.
 
+
+
 ### Step 3: Perform Data Analysis
 
 Descriptive Statistics:
@@ -41,6 +46,8 @@ Descriptive Statistics:
 
 Feature Correlation Analysis:
 - Analyze correlations between features to understand which ones contribute the most to user differentiation.
+
+
 
 ### Step 4: Build and Train the Neural Network
 
@@ -59,6 +66,8 @@ Train the Model:
 - Use the training data to train the neural network.
 - Monitor training and validation accuracy to detect overfitting.
 
+
+
 ### Step 5: Evaluate the Model
 
 Evaluate Test Performance:
@@ -71,6 +80,8 @@ Calculate Metrics:
 
 Visualize Results:
 - Plot training and validation accuracy/loss curves to understand the model's learning behavior.
+
+
 
 ### Step 6: Optimize Model Performance
 
