@@ -5,93 +5,67 @@
 As people increasingly use digital devices like smartphones and smartwatches to access sensitive information, such as online payments and banking, it's crucial to have an enhanced authentication method that continuously and transparently safeguards user data from unauthorized access. This assessment seeks to evaluate acceleration-based features and explore their potential for verifying user identity through neural networks.
 
 
+## 1. Data Analysis and Preparation
 
-### Step 1: Understanding the Problem and Dataset
+### Step 1: Understand the Dataset
+- Review the provided dataset and feature descriptions.
+- Take note of:
+The distinction between time and frequency domain features.
+How data differs across "same-day" and "cross-day" datasets.
 
-Objective:
-- Develop a neural network-based system for user authentication using acceleration-based features. 
-- Train a Feedforward Multi-Layer Perceptron (MLP) to classify users based on movement data.
+### Step 2: Perform Descriptive Statistics
+- Intra-user variance: Analyze the variance of features within each user's data (e.g., for "same-day" and "cross-day" scenarios).
+- Inter-user variance: Examine differences in feature distributions between users.
+- Use the following techniques:
+Calculate means, standard deviations, and correlations.
+Create visualizations (e.g., box plots, histograms, pair plots).
+Perform Principal Component Analysis (PCA) or t-SNE to visualize feature separability.
 
-Dataset Structure:
-- Each user has multiple feature sets derived from time and frequency domain acceleration data. 
-- Files contain data for inter- and intra-user sessions, representing variations in movement patterns.
+### Step 3: Normalize and Standardize the Data
+- Normalize feature values for comparability (e.g., scale features to 0-1 or use z-score normalization).
+- Check for missing values or outliers, and address them appropriately.
 
+## 2. Neural Network Modeling
 
+### Step 4: Prepare the Data for Training
+- Combine data from all users into a unified dataset, labeling samples by user ID.
+- Split the data into:
+Training set (e.g., 70%)
+Validation set (e.g., 15%)
+Test set (e.g., 15%)
 
-### Step 2: Data Loading and Preprocessing
+### Step 5: Configure the Feedforward Neural Network
+- Use a Feedforward Multi-Layer Perceptron (MLP), implemented in Python (e.g., TensorFlow, PyTorch) or MATLAB (feedforwardnet).
+- Suggested configuration:
+Input layer: 131 neurons (if using combined features).
+Hidden layers: Start with 2-3 layers with 64, 128, or 256 neurons each.
+Output layer: 10 neurons (one for each user, using softmax for classification).
+Activation functions: Use ReLU for hidden layers and softmax for output.
+Loss function: Cross-entropy for classification.
+Optimizer: Adam or SGD with learning rate tuning.
+- Train the model for a sufficient number of epochs (e.g., 50-200), using early stopping.
 
-Load the Dataset:
-- Import .mat files for each user and concatenate the data for each user.
-- Assign labels to the samples based on the user ID.
+### Step 6: Evaluate the Model
+- Measure model performance using:
+Accuracy
+Precision, Recall, and F1-Score (for individual users).
+Confusion matrix.
+- Visualize loss and accuracy curves to assess overfitting or underfitting.
 
-Check Data Consistency:
-- Verify that all files for a user have the same number of columns (features).
-- Handle any inconsistencies by truncating or padding where necessary.
+## 3. Feature Optimization
 
-Normalize Features:
-- Normalize the feature values to bring all features to the same scale (e.g., between 0 and 1).
+### Step 7: Feature Selection
+- Experiment with subsets of features:
+Time domain only (88 features).
+Frequency domain only (43 features).
+Combined domain features (131 features).
+- Use feature importance metrics (e.g., feature weights from a trained model, Recursive Feature Elimination (RFE), or PCA).
 
-Split the Dataset:
-- Split the dataset into training (80%) and test (20%) sets.
-- Use stratified splitting to ensure an even distribution of user data across both sets.
-
-
-
-### Step 3: Perform Data Analysis
-
-Descriptive Statistics:
-- Compute summary statistics (mean, standard deviation, variance) for the entire dataset.
-- Analyze intra-user variance (variations within a single user) and inter-user variance (variations between users).
-- Visualize the data using plots such as histograms, box plots, or scatter plots to identify patterns or anomalies.
-
-Feature Correlation Analysis:
-- Analyze correlations between features to understand which ones contribute the most to user differentiation.
-
-
-
-### Step 4: Build and Train the Neural Network
-
-Design the Neural Network:
-- Use MATLAB’s feedforwardnet to define a Feedforward Multi-Layer Perceptron (MLP) with:
-- Input layer: Number of features in the dataset.
-- Hidden layers: Experiment with different configurations (e.g., 3 layers with 50, 25, and 10 neurons).
-- Output layer: Number of users (one neuron per user, with softmax activation).
-
-Configure the Training Parameters:
-- Learning algorithm: Use the Levenberg-Marquardt backpropagation (trainlm).
-- Learning rate: Set an initial value (e.g., 0.01) and adjust during optimization.
-- Epochs: Use 100 epochs to train the model.
-
-Train the Model:
-- Use the training data to train the neural network.
-- Monitor training and validation accuracy to detect overfitting.
-
-
-
-### Step 5: Evaluate the Model
-
-Evaluate Test Performance:
-- Use the test data to evaluate the model's accuracy.
-- Generate a confusion matrix to analyze misclassifications.
-
-Calculate Metrics:
-- Precision, Recall, and F1-Score to assess the classification performance.
-- Analyze these metrics for individual users to identify weak points in the model.
-
-Visualize Results:
-- Plot training and validation accuracy/loss curves to understand the model's learning behavior.
-
-
-
-### Step 6: Optimize Model Performance
-
-Feature Selection:
-- Apply techniques like Principal Component Analysis (PCA) to reduce dimensionality.
-- Retain features that capture the most variance (e.g., 95%).
-
-Hyperparameter Tuning:
-- Experiment with different learning rates, number of neurons, activation functions, or batch sizes.
-- Use grid search or random search methods to find the best hyperparameter combination.
-
-Classifier Comparison (Optional):
-- Compare MLP performance with other classifiers like Support Vector Machines (SVM) or k-Nearest Neighbors (kNN).
+### Step 8: Fine-tune Classifier
+- Experiment with MLP configurations:
+Adjust the number of hidden layers, neurons, and activation functions.
+Apply dropout or batch normalization to improve generalization.
+- Optimize hyperparameters using:
+Grid Search
+Random Search
+Bayesian Optimization
