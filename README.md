@@ -1,4 +1,4 @@
-# AI-ML-Project
+# Artificial Intelligence & Machine Learning Coursework
 
 ## Scenario overview: 
 
