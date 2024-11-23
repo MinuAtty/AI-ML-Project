@@ -13,18 +13,19 @@ details of these feature vectors are outlined below in  feature vectors informat
 |  File name                 |     Description                                                                                |   NF    |   NS   |
 |  ------------------------- |    -----------------------------------------------------------------------------------------   |  -----  |  ----  |
 |  U01_Acc_FreqD_FDay        |    Frequency domain-based acceleration features for User 1 – using the same-day data           |   43    |   36   |
-|  U01_Acc_TimeD_FDay        |    Time domain-based acceleration features for User 1- using the cross-day data                |   88    |   36   |
-|  U01_Acc_TimeD_FreqD_FDay  |    Time and frequency domain-based acceleration features for User 1- using the same-day data   |   131   |   36   |    
+|  U01_Acc_TimeD_FDay        |    Time domain-based acceleration features for User 1- using the cross-day data                |   88    |   36   |    
 |  U01_Acc_FreqD_MDay        |    Frequency domain-based acceleration features for User 1- using the cross-day data           |   43    |   36   |
 |  U01_Acc_TimeD_MDay        |    Time domain-based acceleration features for User 1- using the cross-day data                |   88    |   36   |
+|  U01_Acc_TimeD_FreqD_FDay  |    Time and frequency domain-based acceleration features for User 1- using the same-day data   |   131   |   36   |
 |  U01_Acc_TimeD_FreqD_MDay  |    Time and frequency domain-based acceleration features for User 1- using the same-day data   |   131   |   36   |
 
-- U01: User with its associated ID; 
-- Acc: Acceleration-based data; 
-- FreqD: Frequency domain-based Features;  
-- FDay: First day Features; 
-- TimeD; Time domain-based Features; 
-- NF: Number of features; 
+- U01: User with its associated ID 
+- Acc: Acceleration-based data 
+- FreqD: Frequency domain-based Features   
+- TimeD: Time domain-based Features
+- FDay: First day Features
+- MDay: Cross-day Features 
+- NF: Number of features 
 - NS: Number of samples
 
 <br>
