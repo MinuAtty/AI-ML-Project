@@ -116,7 +116,7 @@ for currentUserNum = 1:10
         for lr = learning_rates
             % Configure network with current parameters
             net = feedforwardnet(hidden_size);
-            net.trainParam.epochs = 500;
+            net.trainParam.epochs = 1000;
             net.trainParam.goal = 1e-6;
             net.trainParam.max_fail = 6;
             net.trainParam.lr = lr;
