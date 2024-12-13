@@ -30,71 +30,106 @@ details of these feature vectors are outlined below in  feature vectors informat
 
 <br>
 
-## 1. Data Analysis and Preparation
+### **1. Data Loading and Preparation**
+1. **Load User Data**:
+   - Load acceleration-based feature datasets for 10 users (`*_Acc_FreqD_FDay.mat` and `*_Acc_FreqD_MDay.mat`).
+   - Extract feature matrices (`Acc_FD_Feat_Vec`) for frequency and time-domain data.
 
-### Step 1: Understand the Dataset
-- Review the provided dataset and feature descriptions.
-- Take note of:
-  - The distinction between time and frequency domain features.
-  - How data differs across "same-day" and "cross-day" datasets.
+2. **Label Assignment**:
+   - Assign labels:
+     - **1** for the target user's data.
+     - **0** for other users' data.
 
-### Step 2: Perform Descriptive Statistics
-- Intra-user variance: Analyze the variance of features within each user's data (e.g., for "same-day" and "cross-day" scenarios).
-- Inter-user variance: Examine differences in feature distributions between users.
-- Use the following techniques:
-  - Calculate means, standard deviations, and correlations.
-  - Create visualizations (e.g., box plots, histograms, pair plots).
-  - Perform Principal Component Analysis (PCA) or t-SNE to visualize feature separability.
+3. **Combine Data**:
+   - Concatenate all feature matrices for each user into a single dataset (`user_data`).
+   - Store labels in `user_labels`.
 
-### Step 3: Normalize and Standardize the Data
-- Normalize feature values for comparability (e.g., scale features to 0-1 or use z-score normalization).
-- Check for missing values or outliers, and address them appropriately.
+---
 
-<br>
+### **2. Variance Calculations**
+1. **Intra-Variance**:
+   - Compute the standard deviation of features for each user.
+   - Normalize by dividing by the maximum feature value for stability.
+   - Average the normalized standard deviations across features for intra-variance per user.
 
-## 2. Neural Network Modeling
+2. **Inter-Variance**:
+   - Calculate the mean and standard deviation of features across all users.
+   - Compute the ratio of feature-wise standard deviation to mean to assess inter-variance.
 
-### Step 4: Prepare the Data for Training
-- Combine data from all users into a unified dataset, labeling samples by user ID.
-- Split the data into:
-  - Training set (e.g., 70%)
-  - Validation set (e.g., 15%)
-  - Test set (e.g., 15%)
+---
 
-### Step 5: Configure the Feedforward Neural Network
-- Use a Feedforward Multi-Layer Perceptron (MLP), implemented in Python (e.g., TensorFlow, PyTorch) or MATLAB (feedforwardnet).
-- Suggested configuration:
-  - Input layer: 131 neurons (if using combined features).
-  - Hidden layers: Start with 2-3 layers with 64, 128, or 256 neurons each.
-  - Output layer: 10 neurons (one for each user, using softmax for classification).
-  - Activation functions: Use ReLU for hidden layers and softmax for output.
-  - Loss function: Cross-entropy for classification.
-  - Optimizer: Adam or SGD with learning rate tuning.
-- Train the model for a sufficient number of epochs (e.g., 50-200), using early stopping.
+### **3. Principal Component Analysis (PCA)**
+1. **Center the Data**:
+   - Subtract the mean from the feature data to center it around zero.
 
-### Step 6: Evaluate the Model
-- Measure model performance using:
-  - Accuracy
-  - Precision, Recall, and F1-Score (for individual users).
-  - Confusion matrix.
-- Visualize loss and accuracy curves to assess overfitting or underfitting.
+2. **Compute Correlation Matrix**:
+   - Generate the correlation matrix of the centered data.
 
-<br>
+3. **Eigenvalue Decomposition**:
+   - Decompose the correlation matrix into eigenvalues and eigenvectors.
+   - Retain significant components based on eigenvalues (`>1e-10`).
 
-## 3. Feature Optimization
+4. **Project Data**:
+   - Transform the original data into the reduced PCA space.
 
-### Step 7: Feature Selection
-- Experiment with subsets of features:
-  - Time domain only (88 features).
-  - Frequency domain only (43 features).
-  - Combined domain features (131 features).
-- Use feature importance metrics (e.g., feature weights from a trained model, Recursive Feature Elimination (RFE), or PCA).
+---
 
-### Step 8: Fine-tune Classifier
-- Experiment with MLP configurations:
-  - Adjust the number of hidden layers, neurons, and activation functions.
-  - Apply dropout or batch normalization to improve generalization.
-- Optimize hyperparameters using:
-  - Grid Search
-  - Random Search
-  - Bayesian Optimization
+### **4. Data Splitting**
+1. **Train-Test Split**:
+   - Use 70% of the data for training and 30% for testing (`cvpartition`).
+   - Split both data (`user_data_pca`) and labels (`user_labels`).
+
+2. **Train-Validation Split**:
+   - Split the training data into:
+     - **Training set (80%)** for fitting the model.
+     - **Validation set (20%)** for hyperparameter tuning.
+
+---
+
+### **5. Neural Network Configuration**
+1. **Define Feedforward Neural Network**:
+   - Use MATLAB's `feedforwardnet` with adjustable hidden layer sizes.
+
+2. **Set Parameters**:
+   - Number of neurons in hidden layers: `[10, 20, 30]`.
+   - Learning rates: `[0.01, 0.1]`.
+   - Maximum epochs: `500`.
+
+3. **Grid Search for Hyperparameters**:
+   - Train networks with different combinations of hidden neurons and learning rates.
+   - Evaluate performance on the validation set using binary classification accuracy.
+
+4. **Select Optimal Model**:
+   - Identify the network configuration with the highest validation accuracy.
+
+---
+
+### **6. Training and Testing**
+1. **Train Final Model**:
+   - Use the optimal hyperparameters to train the model on the final training set.
+
+2. **Test Model**:
+   - Predict labels for the test set using the trained neural network.
+   - Convert raw predictions to binary labels using a threshold (≥0.5).
+
+---
+
+### **7. Evaluation**
+1. **Calculate Accuracy**:
+   - Compute accuracy for both training and testing datasets.
+
+2. **Confusion Matrices**:
+   - Generate confusion matrices for training and testing predictions to visualize classification performance.
+
+---
+
+### **8. Results and Optimization**
+1. **Optimization**:
+   - Compare accuracy and variance metrics before and after applying PCA.
+   - Assess the impact of hyperparameter tuning on model performance.
+
+2. **Visualization**:
+   - Plot:
+     - Intra-variance per user.
+     - Inter-variance across all users.
+     - Confusion matrices for training and testing.
