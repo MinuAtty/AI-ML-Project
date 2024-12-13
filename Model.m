@@ -59,19 +59,16 @@ for currentUserNum = 1:10
         % Accumulate data for inter-variance calculation
         combined_user_data = [combined_user_data; current_user_data];
     end
-     %rng(1);
+     
     % Suppress PCA warnings
     warning('off', 'MATLAB:singularMatrix');
     warning('off', 'MATLAB:rankDeficientMatrix');
 
     % Preprocess data to handle linear dependencies
-    % Center the data
-    user_data = user_data - mean(user_data);
+    user_data = user_data - mean(user_data); % Center the data
     
     % Compute correlation matrix
     correlation_matrix = corrcoef(user_data);
-    
-    % Handle numerical issues
     correlation_matrix(isnan(correlation_matrix)) = 0;
     correlation_matrix(abs(correlation_matrix) < 1e-10) = 0;
     
@@ -88,7 +85,7 @@ for currentUserNum = 1:10
     user_data_pca = user_data * reduced_eigen_vectors;
 
     % Split data into training and testing sets
-    cv_partition = cvpartition(size(user_data_pca, 1), 'HoldOut', 0.3); % 70% training, 30% testing
+    cv_partition = cvpartition(size(user_data_pca, 1), 'HoldOut', 0.4); % 60% training, 40% testing
     train_indices = training(cv_partition);
     test_indices = test(cv_partition);
 
