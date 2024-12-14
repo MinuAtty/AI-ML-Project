@@ -1,14 +1,18 @@
 clc; clear; close all;
 
+% Define hyperparameters globally
+hidden_layer_sizes = [10, 20, 30]; % Different numbers of hidden neurons
+learning_rates = [0.01, 0.1]; % Different learning rates
+
 overall_accuracy = 0; % Initialize overall accuracy
 true_labels = []; % Initialize array to accumulate true labels
 predicted_labels = []; % Initialize array to accumulate predictions
 
-% Initialize array to store intra-variance for each user
+% Initialize storage arrays
 user_intra_variance = zeros(10, 1);
-
-% Initialize array to store feature data for all users
 combined_user_data = [];
+all_results = cell(10, 1);
+all_accuracies = zeros(length(hidden_layer_sizes), length(learning_rates), 10);
 
 for currentUserNum = 1:10
     currentUserID = sprintf('U%02d', currentUserNum); % Format user ID as U01, U02, ..., U10
@@ -59,16 +63,19 @@ for currentUserNum = 1:10
         % Accumulate data for inter-variance calculation
         combined_user_data = [combined_user_data; current_user_data];
     end
-     
+     %rng(1);
     % Suppress PCA warnings
     warning('off', 'MATLAB:singularMatrix');
     warning('off', 'MATLAB:rankDeficientMatrix');
 
     % Preprocess data to handle linear dependencies
-    user_data = user_data - mean(user_data); % Center the data
+    % Center the data
+    user_data = user_data - mean(user_data);
     
     % Compute correlation matrix
     correlation_matrix = corrcoef(user_data);
+    
+    % Handle numerical issues
     correlation_matrix(isnan(correlation_matrix)) = 0;
     correlation_matrix(abs(correlation_matrix) < 1e-10) = 0;
     
@@ -98,13 +105,11 @@ for currentUserNum = 1:10
     y_test = user_labels(test_indices);
 
     % Hyperparameter Grid Search
-    hidden_layer_sizes = [10, 20, 30]; % Different numbers of hidden neurons
-    learning_rates = [0.01, 0.1]; % Different learning rates
     optimal_accuracy = 0;
     optimal_params = struct();
     
     % Create validation set
-    cv_val_partition = cvpartition(length(y_train), 'HoldOut', 0.3);
+    cv_val_partition = cvpartition(length(y_train), 'HoldOut', 0.4);
     val_indices = test(cv_val_partition);
     final_train_data = train_data(~val_indices, :);
     val_data = train_data(val_indices, :);
@@ -112,11 +117,15 @@ for currentUserNum = 1:10
     y_val = y_train(val_indices);
     
     % Grid Search
+    % Initialize results table
+    results_table = zeros(length(hidden_layer_sizes) * length(learning_rates), 3);
+    row = 1;
+    
     for hidden_size = hidden_layer_sizes
         for lr = learning_rates
             % Configure network with current parameters
             net = feedforwardnet(hidden_size);
-            net.trainParam.epochs = 1000;
+            net.trainParam.epochs = 500;
             net.trainParam.goal = 1e-6;
             net.trainParam.max_fail = 6;
             net.trainParam.lr = lr;
@@ -129,6 +138,10 @@ for currentUserNum = 1:10
             val_pred_binary = double(val_pred >= 0.5)';
             val_accuracy = sum(val_pred_binary == y_val) / length(y_val);
             
+            % Store results in table
+            results_table(row, :) = [hidden_size, lr, val_accuracy];
+            row = row + 1;
+            
             % Update best parameters if current combination is better
             if val_accuracy > optimal_accuracy
                 optimal_accuracy = val_accuracy;
@@ -139,6 +152,13 @@ for currentUserNum = 1:10
         end
     end
     
+    % Inside the main loop, replace the results display with:
+    all_results{currentUserNum} = results_table;  % Store results for current user
+    
+    % Store grid search results for combined heatmap
+    grid_data = reshape(results_table(:,3), [length(learning_rates), length(hidden_layer_sizes)])' * 100;
+    all_accuracies(:,:,currentUserNum) = grid_data;
+
     % Display best parameters
     disp(['Best Hidden Size: ', num2str(optimal_params.hidden_size)]);
     disp(['Best Learning Rate: ', num2str(optimal_params.learning_rate)]);
@@ -171,6 +191,44 @@ for currentUserNum = 1:10
     predicted_labels = [predicted_labels; y_test_pred];
 
 end
+
+% Add this after the main loop ends (after "end")
+% Display combined results table for all users
+fprintf('\nCombined Grid Search Results for All Users:\n');
+fprintf('User ID | Hidden Neurons | Learning Rate | Validation Accuracy\n');
+fprintf('--------------------------------------------------------\n');
+for userNum = 1:10
+    userID = sprintf('U%02d', userNum);
+    user_results = all_results{userNum};
+    for i = 1:size(user_results, 1)
+        fprintf('%7s | %13d | %12.3f | %18.2f%%\n', ...
+            userID, user_results(i,1), user_results(i,2), user_results(i,3)*100);
+    end
+end
+fprintf('--------------------------------------------------------\n\n');
+
+% Create combined heatmap for all users
+figure('Name', 'Combined Grid Search Results - All Users', 'Position', [100 100 800 600]);
+
+% Calculate mean accuracy and standard deviation across all users
+mean_accuracies = mean(all_accuracies, 3);
+std_accuracies = std(all_accuracies, 0, 3);
+
+% Create heatmap
+h = heatmap(learning_rates, hidden_layer_sizes, mean_accuracies);
+title('Mean Validation Accuracy (%) Across All Users');
+xlabel('Learning Rate');
+ylabel('Hidden Neurons');
+colormap(jet);
+
+% Customize heatmap appearance
+h.FontSize = 12;
+
+% Add text annotations for standard deviation directly in the title
+title(sprintf('Mean Validation Accuracy (%%) Across All Users\nStd Dev Range: %.1f%% - %.1f%%', ...
+    min(std_accuracies(:)), max(std_accuracies(:))));
+
+% Calculate inter-variance across all users
 
 % Calculate inter-variance across all users
 feature_means = mean(combined_user_data, 1);
