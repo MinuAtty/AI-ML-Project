@@ -134,7 +134,3 @@ The provided MATLAB script implements a neural network model for a user recognit
   - Variance calculations.
   - Accuracy summaries.
   - Confusion matrices for classification performance.
-  
---- 
-
-This structured approach integrates preprocessing, training, evaluation, and visualization to thoroughly assess the neural network model for user classification.
