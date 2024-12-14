@@ -73,7 +73,7 @@ The provided MATLAB script implements a neural network model for a user recognit
    - Split the dataset into training (60%) and testing (40%) subsets.
 
 2. **Validation Split**:
-   - Further split the training data into a final training set and a validation set (40% validation).
+   - Further split the training data into a final training set and a validation set (20% validation).
 
 ---
 
