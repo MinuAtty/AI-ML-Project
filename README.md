@@ -76,7 +76,7 @@ details of these feature vectors are outlined below in  feature vectors informat
 
 ### **4. Data Splitting**
 1. **Train-Test Split**:
-   - Use 70% of the data for training and 30% for testing (`cvpartition`).
+   - Use 60% of the data for training and 40% for testing (`cvpartition`).
    - Split both data (`user_data_pca`) and labels (`user_labels`).
 
 2. **Train-Validation Split**:
@@ -93,7 +93,7 @@ details of these feature vectors are outlined below in  feature vectors informat
 2. **Set Parameters**:
    - Number of neurons in hidden layers: `[10, 20, 30]`.
    - Learning rates: `[0.01, 0.1]`.
-   - Maximum epochs: `500`.
+   - Maximum epochs: `1000`.
 
 3. **Grid Search for Hyperparameters**:
    - Train networks with different combinations of hidden neurons and learning rates.
