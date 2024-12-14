@@ -81,8 +81,8 @@ details of these feature vectors are outlined below in  feature vectors informat
 
 2. **Train-Validation Split**:
    - Split the training data into:
-     - **Training set (80%)** for fitting the model.
-     - **Validation set (20%)** for hyperparameter tuning.
+     - **Training set (70%)** for fitting the model.
+     - **Validation set (30%)** for hyperparameter tuning.
 
 ---
 
