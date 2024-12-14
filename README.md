@@ -30,106 +30,111 @@ details of these feature vectors are outlined below in  feature vectors informat
 
 <br>
 
-### **1. Data Loading and Preparation**
-1. **Load User Data**:
-   - Load acceleration-based feature datasets for 10 users (`*_Acc_FreqD_FDay.mat` and `*_Acc_FreqD_MDay.mat`).
-   - Extract feature matrices (`Acc_FD_Feat_Vec`) for frequency and time-domain data.
-
-2. **Label Assignment**:
-   - Assign labels:
-     - **1** for the target user's data.
-     - **0** for other users' data.
-
-3. **Combine Data**:
-   - Concatenate all feature matrices for each user into a single dataset (`user_data`).
-   - Store labels in `user_labels`.
+The provided MATLAB script implements a neural network model for a user recognition task using user-specific features. Below are the steps organized for clarity:
 
 ---
 
-### **2. Variance Calculations**
-1. **Intra-Variance**:
-   - Compute the standard deviation of features for each user.
-   - Normalize by dividing by the maximum feature value for stability.
-   - Average the normalized standard deviations across features for intra-variance per user.
+### **1. Initialization**
+1. **Hyperparameters Definition**:
+   - Define a grid of hidden layer sizes (`hidden_layer_sizes`) and learning rates (`learning_rates`) for grid search.
+   - Initialize variables for overall accuracy, labels storage, and user-specific metrics (intra-variance).
 
-2. **Inter-Variance**:
-   - Calculate the mean and standard deviation of features across all users.
-   - Compute the ratio of feature-wise standard deviation to mean to assess inter-variance.
+2. **Storage Preparation**:
+   - Initialize arrays and structures to hold results, accuracy values, and combined user data for inter-user variance calculation.
 
 ---
 
-### **3. Principal Component Analysis (PCA)**
-1. **Center the Data**:
-   - Subtract the mean from the feature data to center it around zero.
+### **2. Dataset Preparation**
+1. **User-Specific Data Loading**:
+   - Loop through each user (`currentUserNum`) and load their dataset (both "F-Day" and "M-Day") from `.mat` files.
+   - Combine features from both datasets and assign labels (`1` for the target user, `0` for others).
 
-2. **Compute Correlation Matrix**:
-   - Generate the correlation matrix of the centered data.
+2. **Variance Calculation**:
+   - **Intra-variance**:
+     - Compute the coefficient of variation (normalized standard deviation) for each user’s features.
+   - **Inter-variance**:
+     - Compute feature-level standard deviations and means across all users, normalize, and average them.
 
-3. **Eigenvalue Decomposition**:
-   - Decompose the correlation matrix into eigenvalues and eigenvectors.
-   - Retain significant components based on eigenvalues (`>1e-10`).
+---
 
-4. **Project Data**:
-   - Transform the original data into the reduced PCA space.
+### **3. Data Preprocessing**
+1. **Centering and Correlation Analysis**:
+   - Center the data (subtract the mean).
+   - Compute the correlation matrix to analyze linear dependencies and handle numerical issues.
+
+2. **Dimensionality Reduction**:
+   - Perform eigenvalue decomposition to retain only significant components (eigenvalues above a threshold).
+   - Project data onto the reduced components using PCA.
 
 ---
 
 ### **4. Data Splitting**
-1. **Train-Test Split**:
-   - Use 60% of the data for training and 40% for testing (`cvpartition`).
-   - Split both data (`user_data_pca`) and labels (`user_labels`).
+1. **Training and Testing Split**:
+   - Split the dataset into training (60%) and testing (40%) subsets.
 
-2. **Train-Validation Split**:
-   - Split the training data into:
-     - **Training set (70%)** for fitting the model.
-     - **Validation set (30%)** for hyperparameter tuning.
+2. **Validation Split**:
+   - Further split the training data into a final training set and a validation set (40% validation).
 
 ---
 
-### **5. Neural Network Configuration**
-1. **Define Feedforward Neural Network**:
-   - Use MATLAB's `feedforwardnet` with adjustable hidden layer sizes.
+### **5. Neural Network Training with Grid Search**
+1. **Grid Search for Hyperparameters**:
+   - Iterate through all combinations of `hidden_layer_sizes` and `learning_rates`.
+   - For each combination:
+     - Train a feedforward neural network using the current parameters.
+     - Evaluate its performance on the validation set.
+   - Store results and update the best-performing model parameters.
 
-2. **Set Parameters**:
-   - Number of neurons in hidden layers: `[10, 20, 30]`.
-   - Learning rates: `[0.01, 0.1]`.
-   - Maximum epochs: `1000`.
-
-3. **Grid Search for Hyperparameters**:
-   - Train networks with different combinations of hidden neurons and learning rates.
-   - Evaluate performance on the validation set using binary classification accuracy.
-
-4. **Select Optimal Model**:
-   - Identify the network configuration with the highest validation accuracy.
+2. **Final Training**:
+   - After identifying the optimal parameters, train the best network on the final training set.
 
 ---
 
-### **6. Training and Testing**
-1. **Train Final Model**:
-   - Use the optimal hyperparameters to train the model on the final training set.
+### **6. Model Evaluation**
+1. **Training Accuracy**:
+   - Evaluate the model on the training set and calculate accuracy.
 
-2. **Test Model**:
-   - Predict labels for the test set using the trained neural network.
-   - Convert raw predictions to binary labels using a threshold (≥0.5).
-
----
-
-### **7. Evaluation**
-1. **Calculate Accuracy**:
-   - Compute accuracy for both training and testing datasets.
-
-2. **Confusion Matrices**:
-   - Generate confusion matrices for training and testing predictions to visualize classification performance.
+2. **Testing Accuracy**:
+   - Predict labels for the testing set and calculate accuracy.
+   - Update overall accuracy and accumulate true and predicted labels for all users.
 
 ---
 
-### **8. Results and Optimization**
-1. **Optimization**:
-   - Compare accuracy and variance metrics before and after applying PCA.
-   - Assess the impact of hyperparameter tuning on model performance.
+### **7. Performance Metrics**
+1. **Grid Search Results**:
+   - Display the grid search results (hidden neurons, learning rate, and accuracy) for each user.
 
-2. **Visualization**:
-   - Plot:
+2. **Combined Results**:
+   - Calculate and visualize mean and standard deviation of validation accuracies across all users as a heatmap.
+
+3. **Variance Metrics**:
+   - Display intra-variance (per user) and inter-variance (across users).
+
+4. **Accuracy Metrics**:
+   - Calculate the average accuracy across all users.
+
+---
+
+### **8. Visualization**
+1. **Confusion Matrices**:
+   - Plot confusion matrices for training and testing data.
+
+2. **User Statistics**:
+   - Plot bar charts for:
+     - Mean feature values per user.
+     - Standard deviation of features per user.
      - Intra-variance per user.
-     - Inter-variance across all users.
-     - Confusion matrices for training and testing.
+
+---
+
+### **9. Final Report**
+- The script provides comprehensive performance reporting through:
+  - Grid search results for all users.
+  - Heatmaps of accuracies.
+  - Variance calculations.
+  - Accuracy summaries.
+  - Confusion matrices for classification performance.
+  
+--- 
+
+This structured approach integrates preprocessing, training, evaluation, and visualization to thoroughly assess the neural network model for user classification.
