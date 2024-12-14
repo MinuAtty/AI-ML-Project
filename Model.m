@@ -109,7 +109,7 @@ for currentUserNum = 1:10
     optimal_params = struct();
     
     % Create validation set
-    cv_val_partition = cvpartition(length(y_train), 'HoldOut', 0.4);
+    cv_val_partition = cvpartition(length(y_train), 'HoldOut', 0.2);
     val_indices = test(cv_val_partition);
     final_train_data = train_data(~val_indices, :);
     val_data = train_data(val_indices, :);
